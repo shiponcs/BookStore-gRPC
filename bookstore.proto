@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package bookstore;
+
+service BookStore {
+	rpc SayHello (Empty) returns (HellowReply) {}
+}
+
+message Empty {
+		
+}
+
+message HellowReply {
+	string message = 1;
+}
