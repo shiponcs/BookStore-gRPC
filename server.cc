@@ -92,7 +92,7 @@ void RunServer() {
   std::string server_address("0.0.0.0:50051");
   BookStoreServiceImpl service;
 
-  grpc::EnableDefaultHealthCheckService(true);
+//  grpc::EnableDefaultHealthCheckService(true);
   grpc::reflection::InitProtoReflectionServerBuilderPlugin();
 
 
