@@ -37,13 +37,27 @@ class BookStoreServiceImpl final : public BookStore::Service {
 		writer->Write(book);
 		book.set_id(33);
 		writer->Write(book);
-		
+
+        for(auto const& entry: db) {
+            book.set_id(entry.second.id());
+            book.set_name(entry.second.name());
+            book.set_author(entry.second.author());
+            writer->Write(book);
+        }
+
 		return Status::OK;
 	}
 
     Status PostBook(ServerContext* context, const Book* request, Reply* reply) override {
         std::cout << "PostBook: " << request->id() << " " << request->name() << " " << request->author() <<"\n";
-        reply->set_msg("Book created with id: ");
+        srand((unsigned) time((NULL)));
+        int id = rand();
+        Book book;
+        book.set_id(id);
+        book.set_name(request->name());
+        book.set_author(request->author());
+        db[id] = book;
+        reply->set_msg("Book created with id: " + std::to_string(id));
         return  Status::OK;
     }
 };
