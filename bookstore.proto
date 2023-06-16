@@ -4,6 +4,8 @@ package bookstore;
 
 service BookStore {
 	rpc SayHello (Empty) returns (HellowReply) {}
+	rpc GetAllBooks (Empty) returns (stream Book) {}
+	rpc PostBook (Book) returns (Reply) {}
 }
 
 message Empty {
@@ -12,4 +14,14 @@ message Empty {
 
 message HellowReply {
 	string message = 1;
+}
+
+message Book {
+	int32 id = 1;
+	string name = 2;
+	string author = 3;
+}
+
+message Reply {
+	string msg = 1;
 }
