@@ -6,6 +6,9 @@ service BookStore {
 	rpc SayHello (Empty) returns (HellowReply) {}
 	rpc GetAllBooks (Empty) returns (stream Book) {}
 	rpc PostBook (Book) returns (Reply) {}
+	rpc GetABookById (SearchRequest) returns (Book) {}
+	rpc DeleteABook (SearchRequest) returns (Empty) {}
+	rpc UpdateABook (Book) returns (Book) {}
 }
 
 message Empty {
@@ -20,6 +23,10 @@ message Book {
 	int32 id = 1;
 	string name = 2;
 	string author = 3;
+}
+
+message SearchRequest {
+	int32 id = 1;
 }
 
 message Reply {

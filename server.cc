@@ -11,12 +11,14 @@ using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::ServerWriter;
 using grpc::Status;
+using grpc::StatusCode;
 
 using bookstore::BookStore;
 using bookstore::Empty;
 using bookstore::HellowReply;
 using bookstore::Book;
 using bookstore::Reply;
+using bookstore::SearchRequest;
 
 
 std::map< int, Book > db;
@@ -30,13 +32,6 @@ class BookStoreServiceImpl final : public BookStore::Service {
 	
 	Status GetAllBooks(ServerContext* context, const Empty* request, ServerWriter<Book>* writer) override {
 		Book book;
-		book.set_id(5);
-		book.set_name("GEB");
-		book.set_author("ABC");
-		
-		writer->Write(book);
-		book.set_id(33);
-		writer->Write(book);
 
         for(auto const& entry: db) {
             book.set_id(entry.second.id());
@@ -48,8 +43,27 @@ class BookStoreServiceImpl final : public BookStore::Service {
 		return Status::OK;
 	}
 
+    Status GetABookById(ServerContext* context, const SearchRequest* request, Book* reply) override {
+        int requestedId = request->id();
+        if(db.find(requestedId) == db.end()) {
+            return Status(StatusCode::NOT_FOUND, "No book entry found for this id");
+
+        }
+        Book requestedBook = db[requestedId];
+        reply->CopyFrom(requestedBook);
+        return Status::OK;
+    }
+
+    Status DeleteABook(ServerContext* context, const SearchRequest* request, Empty* reply) override {
+        int requestedId = request->id();
+        if(db.find(requestedId) == db.end()) {
+            return Status(StatusCode::NOT_FOUND, "No book entry found for this id");
+        }
+        db.erase(requestedId);
+        return Status::OK;
+    }
+
     Status PostBook(ServerContext* context, const Book* request, Reply* reply) override {
-        std::cout << "PostBook: " << request->id() << " " << request->name() << " " << request->author() <<"\n";
         srand((unsigned) time((NULL)));
         int id = rand();
         Book book;
@@ -59,6 +73,18 @@ class BookStoreServiceImpl final : public BookStore::Service {
         db[id] = book;
         reply->set_msg("Book created with id: " + std::to_string(id));
         return  Status::OK;
+    }
+
+    Status UpdateABook(ServerContext* context, const Book* request, Book* reply) override {
+        int requestedId = request->id();
+        if(db.find(requestedId) == db.end()) {
+            return Status(StatusCode::NOT_FOUND, "No book entry found for this id");
+        }
+        db[requestedId] = *request;
+
+        reply->CopyFrom(*request);
+
+        return Status::OK;
     }
 };
 
